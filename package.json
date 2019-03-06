@@ -25,6 +25,7 @@
   "homepage": "https://github.com/reneeleung/github-battle#readme",
   "dependencies": {
     "axios": "^0.18.0",
+    "query-string": "^6.3.0",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-router-dom": "^4.3.1"
