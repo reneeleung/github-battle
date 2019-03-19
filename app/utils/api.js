@@ -1,28 +1,23 @@
-var axios = require('axios');
+const axios = require('axios');
 
-var id = "YOUR_CLIENT_ID";
-var sec = "YOUR_SECRET_ID";
-var params = "?client_id=" + id + "&client_secret=" + sec;
+const id = "YOUR_CLIENT_ID";
+const sec = "YOUR_SECRET_ID";
+const params = `?client_id=${id}&client_secret=${sec}`;
 
 function getProfile(username) {
-    return axios.get('https://api.github.com/users/' + username + params)
-        .then(function(user) {
-            return user.data;
-        });
+    return axios.get(`https://api.github.com/users/${username}${params}`)
+        .then(({ data }) => data); // using arrow functions for anonymous functions and destructuring .then((user) => user.data);
 }
 
 function getRepos(username) {
-    return axios.get('https://api.github.com/users/' + username + '/repos' + params + '&per_page=100')
+    return axios.get(`https://api.github.com/users/${username}/repos${params}&per_page=100`)
 }
 
 function getStarCount(repos) {
-    return repos.data.reduce(function(count, repo) {
-        return count + repo.stargazers_count;
-    }, 0);
+    return repos.data.reduce((count, { stargazers_count }) => count + stargazers_count, 0);
 }
 
-function calculateScore(profile, repos) {
-    var followers = profile.followers;
+function calculateScore({ followers }, repos) {
     var totalStars = getStarCount(repos);
     return followers * 3 + totalStars;
 }
@@ -33,39 +28,29 @@ function handleError(error) {
 }
 
 function getUserData(player) {
-    return axios.all([
+    return Promise.all([ /* Babel polyfill 'Promise' if web browser doesn't support it */
         /* Array of promises (asynchronous) */
         getProfile(player),
         getRepos(player)
-    ]).then(function(data) {
-        //var profile = data[0];
-        //var repos = data[1];
-        [profile, repos] = data; /* ES6 */
-
-        return {
-            profile: profile,
-            score: calculateScore(profile, repos)
-        }
-    });
+    ]).then(([profile, repos]) => (/* implicit return */ {
+        profile: profile,
+        score: calculateScore(profile, repos)
+    }));
 }
 
 function sortPlayers(players) {
-    return players.sort(function(a,b) {
-        return b.score - a.score;
-    });
+    return players.sort((a,b) => b.score - a.score);
 }
 
 module.exports = {
-    battle: function(players) {
-        return axios.all(/* promises */ players.map(getUserData))
+    battle (players) /* short hand syntax */ {
+        return Promise.all(/* promises */ players.map(getUserData))
             .then(sortPlayers)
             .catch(handleError);
     },
-    fetchPopularRepos: function(language) {
-        var encodedURI = window.encodeURI('https://api.github.com/search/repositories?q=stars:>1+language:' + language + '&sort=stars&order=desc&type=Repositories');
+    fetchPopularRepos (language) {
+        var encodedURI = window.encodeURI(`https://api.github.com/search/repositories?q=stars:>1+language:${language}&sort=stars&order=desc&type=Repositories`);
         return axios.get(encodedURI)
-        .then(function (response) {
-            return response.data.items;
-        });
+        .then(({ data }) => data.items);
     }
 }
