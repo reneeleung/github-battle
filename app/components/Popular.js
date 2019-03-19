@@ -62,16 +62,14 @@ class Popular extends React.Component {
         // AJAX request
         this.updateLanguage(this.state.selectedLanguage);
     }
-    updateLanguage = (lang) => {
+    updateLanguage = async (lang) => {
         this.setState(() => ({
                 selectedLanguage: lang,
                 repos: null
         }));
 
-        fetchPopularRepos(lang)
-            .then((repos) => {
-                this.setState(() => ({ repos: repos }))
-            }); /* Arrow function will automatically bind 'this' */
+        const repos = await fetchPopularRepos(lang);
+        this.setState(() => ({ repos: repos }));
     }
     render() {
         const { selectedLanguage, repos } = this.state;
