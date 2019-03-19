@@ -1,7 +1,7 @@
-var React = require('react');
-var PropTypes = require('prop-types');
+const React = require('react');
+const PropTypes = require('prop-types');
 
-var styles = {
+const styles = {
     content: {
         textAlign: 'center',
         fontSize: '35px'
@@ -18,23 +18,14 @@ class Loading extends React.Component {
         };
     }
     componentDidMount() {
-        var stopper = this.props.text + '...';
-        this.interval = window.setInterval(function() {
-            if (this.state.text === stopper) {
-                this.setState(function() {
-                    return {
-                        text: this.props.text
-                    }
-                });
-            }
-            else {
-                this.setState(function(prevState) {
-                    return {
-                        text: prevState.text + '.'
-                    }
-                });
-            }
-        }.bind(this) /* allows 'this' in the function*/ , this.props.speed /* Time to invoke the function */ )
+        const { text, speed } = this.props;
+        const stopper = text + '...';
+        this.interval = window.setInterval(() => {
+            /* use ternary */
+            this.state.text === stopper
+                ? this.setState(() => ({ text: text }))
+                : this.setState((prevState) => ({ text: prevState.text + '.' }))
+        } /* arrow function can automatically bind 'this' */ , speed /* Time to invoke the function */ )
     }
     componentWillUnmount() {
         window.clearInterval(this.interval);
