@@ -53,19 +53,16 @@ RepoGrid.propTypes = {
 }
 
 class Popular extends React.Component {
-    constructor (props) {
-        super(props);
-        this.state = {
-            selectedLanguage: 'All',
-            repos: null
-        };
-        this.updateLanguage = this.updateLanguage.bind(this); /* Always have updateLanguage called in the correct component*/
-    }
+    state = {
+        selectedLanguage: 'All',
+        repos: null
+    };
+
     componentDidMount () {
         // AJAX request
         this.updateLanguage(this.state.selectedLanguage);
     }
-    updateLanguage(lang) {
+    updateLanguage = (lang) => {
         this.setState(() => ({
                 selectedLanguage: lang,
                 repos: null
